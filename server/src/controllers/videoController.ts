@@ -3,7 +3,7 @@ import Video from "../models/Video";
 
 import * as c from "../config/config";
 import { getUserId } from "../helpers/authHelper";
-import {requireAuth} from "../auth/requireAuth";
+import { requireAuth } from "../auth/requireAuth";
 
 const router: Router = Router();
 
@@ -28,9 +28,51 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
 });
 
 // Get all videos
-router.get("/", async (req: Request, res: Response) => {
-  const items = [];
-  res.send(items);
+router.get("/", requireAuth, async (req: Request, res: Response) => {
+  const userId = getUserId(req.headers);
+
+  const videos = await Video.findAll({
+    where: {
+      userId,
+    },
+  });
+
+  res.status(200).send(videos);
+});
+
+// Get one video
+router.get("/:id", requireAuth, async (req: Request, res: Response) => {
+  const userId = getUserId(req.headers);
+  const { id } = req.params;
+  const video = await Video.findOne({
+    where: {
+      id,
+      userId,
+    },
+  });
+
+  res.status(200).send(video);
+});
+
+// Update one video
+router.patch("/:id", requireAuth, async (req: Request, res: Response) => {
+  const userId = getUserId(req.headers);
+  const { id } = req.params;
+  const { name, description } = req.body;
+  const video = await Video.update(
+    {
+      name,
+      description,
+    },
+    {
+      where: {
+        id,
+        userId,
+      },
+    }
+  );
+
+  res.status(200).send(video);
 });
 
 export default router;
