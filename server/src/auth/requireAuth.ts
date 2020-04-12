@@ -13,7 +13,9 @@ export async function requireAuth(
   res: Response,
   next: NextFunction
 ) {
-  const verifiedToken = await verifyToken(req.headers.authorization);
+  await verifyToken(
+    req.headers.Authorization || req.headers.authorization
+  );
 
   next();
 }
@@ -42,7 +44,9 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   try {
     const response = await Axios.get(jwksUrl);
     console.log(response);
-    const verifedToken = verify(token, response.data, { algorithms: ["RS256"] });
+    const verifedToken = verify(token, response.data, {
+      algorithms: ["RS256"],
+    });
 
     console.log("verfied token", verifedToken);
     return verifedToken as JwtPayload;

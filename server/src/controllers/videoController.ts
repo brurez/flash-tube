@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
-import Video from "../models/Video";
 
-import * as c from "../config/config";
+import * as AWS from "../aws";
+import Video from "../models/Video";
 import { getUserId } from "../helpers/authHelper";
 import { requireAuth } from "../auth/requireAuth";
 
@@ -11,15 +11,22 @@ const router: Router = Router();
 router.post("/", requireAuth, async (req: Request, res: Response) => {
   const userId = getUserId(req.headers);
 
-  const { title } = req.body;
+  const { title, url } = req.body;
 
   if (!title) {
     return res.status(400).send({ message: "Name is required" });
   }
 
+  if (!url) {
+    return res.status(400).send({ message: "Url is required" });
+  }
+
+  const urlOnAws = AWS.getGetSignedUrl(url);
+
   let video = await new Video({
     title,
     userId,
+    url: urlOnAws,
   });
 
   video = await video.save();
@@ -74,5 +81,16 @@ router.patch("/:id", requireAuth, async (req: Request, res: Response) => {
 
   res.status(200).send(video);
 });
+
+// Get a signed url to put a new item in the bucket
+router.get(
+  "/signed-url/:fileName",
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const { fileName } = req.params;
+    const url = AWS.getPutSignedUrl(fileName);
+    res.status(201).send({ url: url });
+  }
+);
 
 export default router;

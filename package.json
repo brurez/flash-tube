@@ -7,7 +7,7 @@
   "devDependencies": {},
   "scripts": {
     "dev": "docker-compose up -V",
-    "dev:server": "docker-compose up -V api"
+    "dev:server": "docker-compose up -d postgres && cd server && yarn dev"
   },
   "repository": {
     "type": "git",

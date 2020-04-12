@@ -14,7 +14,7 @@ export async function getVideos(idToken: string): Promise<Video[]> {
     },
   });
   console.log("Videos:", response.data);
-  return response.data.items;
+  return response.data;
 }
 
 export async function createVideo(
@@ -22,7 +22,7 @@ export async function createVideo(
   newVideo: CreateVideoRequest
 ): Promise<Video> {
   const response = await Axios.post(
-    `${apiEndpoint}/videos`,
+    `${apiEndpoint}/video`,
     JSON.stringify(newVideo),
     {
       headers: {
@@ -31,7 +31,7 @@ export async function createVideo(
       },
     }
   );
-  return response.data.item;
+  return response.data;
 }
 
 export async function patchVideo(
