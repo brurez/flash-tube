@@ -4,6 +4,8 @@ services:
     image: 'postgres:latest'
     environment:
       - POSTGRES_PASSWORD=postgres_password
+    ports:
+      - '5432:5432'
   nginx:
     restart: always
     build:
@@ -13,16 +15,19 @@ services:
       - '3000:80'
     depends_on:
       - client
-      - server
-  server:
+      - api
+  api:
     build:
       dockerfile: Dockerfile.dev
       context: ./server
     volumes:
       - /app/node_modules
       - ./server:/app
+    ports:
+      - '5000:5000'
+      - '9229:9229'
     environment:
-      - POSTGRES_USER=postgres
+      - POSTGRES_USERNAME=postgres
       - POSTGRES_HOST=postgres
       - POSTGRES_DATABASE=postgres
       - POSTGRES_PASSWORD=postgres_password

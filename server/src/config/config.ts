@@ -1,6 +1,6 @@
 export const config = {
   db: {
-    username: process.env.POSTGRES_USERNANE,
+    username: process.env.POSTGRES_USERNAME,
     password: process.env.POSTGRES_PASSWORD,
     name: process.env.POSTGRES_DATABASE,
     host: process.env.POSTGRES_HOST,

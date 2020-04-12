@@ -3,12 +3,8 @@ import { config } from "./config";
 
 const c = config.db;
 
-// Instantiate new Sequelize instance!
-export const sequelize = new Sequelize({
-  username: c.username,
-  password: c.password,
-  database: c.database,
+export const sequelize = new Sequelize(c.name, c.username, c.password, {
   host: c.host,
-  dialect: c.dialect,
+  dialect: "postgres",
   storage: ":memory:",
 });

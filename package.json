@@ -1,0 +1,22 @@
+{
+  "name": "flash-tube",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "dev": "docker-compose up -V",
+    "dev:server": "docker-compose up -V api"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brurez/flash-tube.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brurez/flash-tube/issues"
+  },
+  "homepage": "https://github.com/brurez/flash-tube#readme"
+}

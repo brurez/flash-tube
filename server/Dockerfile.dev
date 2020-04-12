@@ -1,6 +1,9 @@
 FROM node
 WORKDIR /app
+
 COPY ./package.json ./
-RUN npm install
+RUN yarn global add typescript
+RUN yarn global add ts-node
+RUN yarn install
 COPY . .
-CMD ["npm", "run", "dev"]
+CMD ["yarn", "dev"]
