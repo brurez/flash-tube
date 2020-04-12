@@ -102,7 +102,7 @@ export class Videos extends React.PureComponent<VideoProps, VideosState> {
               color: "teal",
               labelPosition: "left",
               icon: "add",
-              content: "New task",
+              content: "New video",
               onClick: this.onVideoCreate,
             }}
             fluid

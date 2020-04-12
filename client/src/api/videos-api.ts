@@ -7,7 +7,7 @@ import { UpdateVideoRequest } from "../types/UpdateVideoRequest";
 export async function getVideos(idToken: string): Promise<Video[]> {
   console.log("Fetching videos");
 
-  const response = await Axios.get(`${apiEndpoint}/video`, {
+  const response = await Axios.get(`/${apiEndpoint}/video`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${idToken}`,
@@ -22,7 +22,7 @@ export async function createVideo(
   newVideo: CreateVideoRequest
 ): Promise<Video> {
   const response = await Axios.post(
-    `${apiEndpoint}/video`,
+    `/${apiEndpoint}/video`,
     JSON.stringify(newVideo),
     {
       headers: {
@@ -40,7 +40,7 @@ export async function patchVideo(
   updatedVideo: UpdateVideoRequest
 ): Promise<void> {
   await Axios.patch(
-    `${apiEndpoint}/video/${videoId}`,
+    `/${apiEndpoint}/video/${videoId}`,
     JSON.stringify(updatedVideo),
     {
       headers: {
@@ -55,7 +55,7 @@ export async function deleteVideo(
   idToken: string,
   videoId: string
 ): Promise<void> {
-  await Axios.delete(`${apiEndpoint}/video/${videoId}`, {
+  await Axios.delete(`/${apiEndpoint}/video/${videoId}`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${idToken}`,
@@ -67,9 +67,8 @@ export async function getUploadUrl(
   idToken: string,
   videoId: string
 ): Promise<string> {
-  const response = await Axios.post(
-    `${apiEndpoint}/video/${videoId}/attachment`,
-    "",
+  const response = await Axios.get(
+    `/${apiEndpoint}/video/${videoId}/attachment`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -77,7 +76,7 @@ export async function getUploadUrl(
       },
     }
   );
-  return response.data.uploadUrl;
+  return response.data.url;
 }
 
 export async function uploadFile(

@@ -8,7 +8,7 @@ import {
   UpdatedAt,
   ForeignKey,
 } from "sequelize-typescript";
-// import { User } from "../../users/models/User";
+import { DataTypes } from "sequelize";
 
 @Table
 export default class Video extends Model<Video> {
@@ -18,7 +18,7 @@ export default class Video extends Model<Video> {
   @Column
   public userId!: string;
 
-  @Column
+  @Column(DataTypes.STRING(1234))
   public url!: string;
 
   @Column

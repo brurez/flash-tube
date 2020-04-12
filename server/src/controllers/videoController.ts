@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import cors from "cors";
 
 import * as AWS from "../aws";
 import Video from "../models/Video";
@@ -8,25 +9,19 @@ import { requireAuth } from "../auth/requireAuth";
 const router: Router = Router();
 
 // Create video
+router.options("/", cors());
 router.post("/", requireAuth, async (req: Request, res: Response) => {
   const userId = getUserId(req.headers);
 
-  const { title, url } = req.body;
+  const { title } = req.body;
 
   if (!title) {
     return res.status(400).send({ message: "Name is required" });
   }
 
-  if (!url) {
-    return res.status(400).send({ message: "Url is required" });
-  }
-
-  const urlOnAws = AWS.getGetSignedUrl(url);
-
   let video = await new Video({
     title,
     userId,
-    url: urlOnAws,
   });
 
   video = await video.save();
@@ -44,6 +39,10 @@ router.get("/", requireAuth, async (req: Request, res: Response) => {
     },
   });
 
+  videos.forEach((video) => {
+    video.url = AWS.getGetSignedUrl(video.id.toString());
+  });
+
   res.status(200).send(videos);
 });
 
@@ -57,18 +56,20 @@ router.get("/:id", requireAuth, async (req: Request, res: Response) => {
       userId,
     },
   });
+  video.url = AWS.getGetSignedUrl(video.id.toString());
 
   res.status(200).send(video);
 });
 
 // Update one video
+router.options("/:id", cors());
 router.patch("/:id", requireAuth, async (req: Request, res: Response) => {
   const userId = getUserId(req.headers);
   const { id } = req.params;
-  const { name, description } = req.body;
+  const { title, description } = req.body;
   const video = await Video.update(
     {
-      name,
+      title,
       description,
     },
     {
@@ -84,12 +85,13 @@ router.patch("/:id", requireAuth, async (req: Request, res: Response) => {
 
 // Get a signed url to put a new item in the bucket
 router.get(
-  "/signed-url/:fileName",
+  "/:id/attachment",
   requireAuth,
   async (req: Request, res: Response) => {
-    const { fileName } = req.params;
-    const url = AWS.getPutSignedUrl(fileName);
-    res.status(201).send({ url: url });
+    const { id } = req.params;
+    const url = AWS.getPutSignedUrl(id);
+    console.log('ATTACHMENT URL', id, url);
+    res.status(201).send({ url });
   }
 );
 

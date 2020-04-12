@@ -1,4 +1,4 @@
 export interface UpdateVideoRequest {
   title: string;
-  userId: string;
+  description: string;
 }

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Form, Button } from "semantic-ui-react";
 import Auth from "../auth/Auth";
-import { getUploadUrl, uploadFile } from "../api/videos-api";
+import { getUploadUrl, patchVideo, uploadFile } from "../api/videos-api";
 
 enum UploadState {
   NoUpload,
@@ -9,7 +9,7 @@ enum UploadState {
   UploadingFile,
 }
 
-interface EditTodoProps {
+interface EditVideoProps {
   match: {
     params: {
       videoId: string;
@@ -18,17 +18,19 @@ interface EditTodoProps {
   auth: Auth;
 }
 
-interface EditTodoState {
+interface EditVideoState {
   file: any;
+  video: any;
   uploadState: UploadState;
 }
 
 export class EditVideo extends React.PureComponent<
-  EditTodoProps,
-  EditTodoState
+  EditVideoProps,
+  EditVideoState
 > {
-  state: EditTodoState = {
+  state: EditVideoState = {
     file: undefined,
+    video: { description: "" },
     uploadState: UploadState.NoUpload,
   };
 
@@ -41,30 +43,39 @@ export class EditVideo extends React.PureComponent<
     });
   };
 
+  handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, name } = event.target;
+
+    this.setState({ video: { ...this.state.video, [name]: value } });
+  };
+
   handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
 
-    try {
-      if (!this.state.file) {
-        alert("File should be selected");
-        return;
+    if (this.state.file) {
+      try {
+        this.setUploadState(UploadState.FetchingPresignedUrl);
+        const uploadUrl = await getUploadUrl(
+          this.props.auth.getIdToken(),
+          this.props.match.params.videoId
+        );
+        console.log('uploadUrl', uploadUrl);
+        this.setUploadState(UploadState.UploadingFile);
+        await uploadFile(uploadUrl, this.state.file);
+
+        alert("File was uploaded!");
+      } catch (e) {
+        alert("Could not upload a file: " + e.message);
+      } finally {
+        this.setUploadState(UploadState.NoUpload);
       }
-
-      this.setUploadState(UploadState.FetchingPresignedUrl);
-      const uploadUrl = await getUploadUrl(
-        this.props.auth.getIdToken(),
-        this.props.match.params.videoId
-      );
-
-      this.setUploadState(UploadState.UploadingFile);
-      await uploadFile(uploadUrl, this.state.file);
-
-      alert("File was uploaded!");
-    } catch (e) {
-      alert("Could not upload a file: " + e.message);
-    } finally {
-      this.setUploadState(UploadState.NoUpload);
     }
+
+    await patchVideo(
+      this.props.auth.getIdToken(),
+      this.props.match.params.videoId,
+      this.state.video
+    );
   };
 
   setUploadState(uploadState: UploadState) {
@@ -76,7 +87,7 @@ export class EditVideo extends React.PureComponent<
   render() {
     return (
       <div>
-        <h1>Upload new image</h1>
+        <h1>Edit Video</h1>
 
         <Form onSubmit={this.handleSubmit}>
           <Form.Field>
@@ -86,6 +97,15 @@ export class EditVideo extends React.PureComponent<
               accept="image/*"
               placeholder="Image to upload"
               onChange={this.handleFileChange}
+            />
+          </Form.Field>
+          <Form.Field>
+            <label>Description</label>
+            <input
+              placeholder="Video description"
+              value={this.state.video.description}
+              name="description"
+              onChange={this.handleVideoChange}
             />
           </Form.Field>
 
@@ -108,7 +128,7 @@ export class EditVideo extends React.PureComponent<
           loading={this.state.uploadState !== UploadState.NoUpload}
           type="submit"
         >
-          Upload
+          Save Video
         </Button>
       </div>
     );

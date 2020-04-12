@@ -71,7 +71,7 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
 
     try {
         const response = await Axios.get(jwksUrl);
-        console.log(response);
+        // console.log(response);
         var verifedToken = verify(token, response.data, { algorithms: ['RS256'] });
 
         console.log('verfied token', verifedToken);
