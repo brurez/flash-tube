@@ -100,7 +100,7 @@ export default class App extends Component<AppProps, AppState> {
           path="/video/:videoId/edit"
           exact
           render={(props) => {
-            return <EditVideo {...props} auth={this.props.auth} />;
+            return <EditVideo {...props} auth={this.props.auth}/>;
           }}
         />
 

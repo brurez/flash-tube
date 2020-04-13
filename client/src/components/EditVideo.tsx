@@ -1,7 +1,12 @@
 import * as React from "react";
 import { Form, Button } from "semantic-ui-react";
 import Auth from "../auth/Auth";
-import { getUploadUrl, patchVideo, uploadFile } from "../api/videos-api";
+import {
+  getUploadUrl,
+  patchVideo,
+  uploadFile,
+  getOneVideo,
+} from "../api/videos-api";
 
 enum UploadState {
   NoUpload,
@@ -16,6 +21,7 @@ interface EditVideoProps {
     };
   };
   auth: Auth;
+  history: any;
 }
 
 interface EditVideoState {
@@ -34,6 +40,16 @@ export class EditVideo extends React.PureComponent<
     uploadState: UploadState.NoUpload,
   };
 
+  async componentDidMount(): Promise<void> {
+    const video = await getOneVideo(
+      this.props.auth.getIdToken(),
+      this.props.match.params.videoId
+    );
+    this.setState({
+      video: { description: video.description },
+    });
+  }
+
   handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
@@ -51,7 +67,15 @@ export class EditVideo extends React.PureComponent<
 
   handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
+    await patchVideo(
+        this.props.auth.getIdToken(),
+        this.props.match.params.videoId,
+        this.state.video
+    );
+    this.props.history.push('/')
+  };
 
+  handleUpload = async (event: React.SyntheticEvent) => {
     if (this.state.file) {
       try {
         this.setUploadState(UploadState.FetchingPresignedUrl);
@@ -59,7 +83,7 @@ export class EditVideo extends React.PureComponent<
           this.props.auth.getIdToken(),
           this.props.match.params.videoId
         );
-        console.log('uploadUrl', uploadUrl);
+        console.log("uploadUrl", uploadUrl);
         this.setUploadState(UploadState.UploadingFile);
         await uploadFile(uploadUrl, this.state.file);
 
@@ -70,12 +94,6 @@ export class EditVideo extends React.PureComponent<
         this.setUploadState(UploadState.NoUpload);
       }
     }
-
-    await patchVideo(
-      this.props.auth.getIdToken(),
-      this.props.match.params.videoId,
-      this.state.video
-    );
   };
 
   setUploadState(uploadState: UploadState) {
@@ -99,6 +117,7 @@ export class EditVideo extends React.PureComponent<
               onChange={this.handleFileChange}
             />
           </Form.Field>
+          {this.renderButton()}
           <Form.Field>
             <label>Description</label>
             <input
@@ -108,8 +127,7 @@ export class EditVideo extends React.PureComponent<
               onChange={this.handleVideoChange}
             />
           </Form.Field>
-
-          {this.renderButton()}
+          <Button type="submit">Save video metadata</Button>
         </Form>
       </div>
     );
@@ -126,9 +144,9 @@ export class EditVideo extends React.PureComponent<
         )}
         <Button
           loading={this.state.uploadState !== UploadState.NoUpload}
-          type="submit"
+          onClick={this.handleUpload}
         >
-          Save Video
+          Upload new video
         </Button>
       </div>
     );

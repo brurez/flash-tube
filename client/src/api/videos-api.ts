@@ -17,6 +17,19 @@ export async function getVideos(idToken: string): Promise<Video[]> {
   return response.data;
 }
 
+export async function getOneVideo(idToken: string, id: string): Promise<Video> {
+  console.log("Fetching one video");
+
+  const response = await Axios.get(`/${apiEndpoint}/video/${id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+  });
+  console.log("Video:", response.data);
+  return response.data;
+}
+
 export async function createVideo(
   idToken: string,
   newVideo: CreateVideoRequest
