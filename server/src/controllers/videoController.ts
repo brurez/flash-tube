@@ -61,6 +61,16 @@ router.get("/:id", requireAuth, async (req: Request, res: Response) => {
   res.status(200).send(video);
 });
 
+// Delete a video
+
+router.delete("/:id", requireAuth, async (req: Request, res: Response) => {
+  const userId = getUserId(req.headers);
+  const { id } = req.params;
+
+  const result = await Video.destroy({ where: { id, userId } });
+  res.status(200).send({ deletedVideos: result });
+});
+
 // Update one video
 router.options("/:id", cors());
 router.patch("/:id", requireAuth, async (req: Request, res: Response) => {
@@ -90,7 +100,7 @@ router.get(
   async (req: Request, res: Response) => {
     const { id } = req.params;
     const url = AWS.getPutSignedUrl(id);
-    console.log('ATTACHMENT URL', id, url);
+    console.log("ATTACHMENT URL", id, url);
     res.status(201).send({ url });
   }
 );
