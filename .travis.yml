@@ -11,8 +11,8 @@ env:
 #script:
 #  - docker run -e CI=true brurez/flash-tube-client-test npm run test -- --coverage
 after_success:
-  - docker build -t brurez/flash-tube-client ./client
-  - docker build -t brurez/flash-tube-server ./server
+#  - docker build -t brurez/flash-tube-client ./client
+#  - docker build -t brurez/flash-tube-server ./server
   # Log in to the docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   # Install Kubectl
