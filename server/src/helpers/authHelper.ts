@@ -1,7 +1,7 @@
 import { Jwt } from "../auth/Jwt";
 import { decode } from "jsonwebtoken";
 
-export function getUserId(headers): string {
+export function getUserId(headers: any): string {
   const authHeader = headers.Authorization || headers.authorization;
   console.log("authHeader", authHeader);
   const token = getToken(authHeader);

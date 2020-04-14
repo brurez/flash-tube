@@ -7,7 +7,12 @@
   "devDependencies": {},
   "scripts": {
     "dev": "docker-compose up -V",
-    "dev:server": "docker-compose up -d postgres && cd server && yarn dev"
+    "dev:server": "docker-compose up -d postgres && cd server && yarn dev",
+    "docker-build:server": "docker build -t brurez/flash-server:latest -f server/Dockerfile server",
+    "docker-build:client": "docker build -t brurez/flash-client:latest -f client/Dockerfile client",
+    "docker-push:server": "docker push brurez/flash-server",
+    "docker-push:client": "docker push brurez/flash-client",
+    "docker": "docker-build:server && docker-build:client && docker-push:server && docker-push:client"
   },
   "repository": {
     "type": "git",

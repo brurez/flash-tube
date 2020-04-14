@@ -1,5 +1,5 @@
 import "source-map-support/register";
-import { NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { decode, verify } from "jsonwebtoken";
 import Axios from "axios";
 
@@ -14,7 +14,7 @@ export async function requireAuth(
   next: NextFunction
 ) {
   await verifyToken(
-    req.headers.Authorization || req.headers.authorization
+    req.headers.authorization
   );
 
   next();
