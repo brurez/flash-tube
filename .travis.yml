@@ -1,22 +1,22 @@
-language: generic
 sudo: required
 services:
   - docker
 env:
   global:
     - SHA=$(git rev-parse HEAD)
-    - DOCKER_COMPOSE_VERSION=1.24.1
-#before_install:
-#  - docker build -t brurez/flash-tube-client-test -f ./client/Dockerfile.dev ./client
-#script:
-#  - docker run -e CI=true brurez/flash-tube-client-test npm run test -- --coverage
-after_success:
-#  - docker build -t brurez/flash-tube-client ./client
-#  - docker build -t brurez/flash-tube-server ./server
-  # Log in to the docker CLI
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Install Kubectl
-  - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.10.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+before_install:
+  - openssl aes-256-cbc -K $encrypted_5013f867ced9_key -iv $encrypted_5013f867ced9_iv
+    -in service-account.json.enc -out service-account.json -d
+  - curl https://sdk.cloud.google.com | bash > /dev/null;
+  - source $HOME/google-cloud-sdk/path.bash.inc
+  - gcloud components update kubectl
+  - gcloud auth activate-service-account --key-file service-account.json
+  - gcloud config set project k8s-microservices-254914
+  - gcloud config set compute/zone us-central1-a
+  - gcloud container clusters get-credentials k8s-microservice-cluster
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
 deploy:
   provider: script
   script: bash ./deploy.sh
